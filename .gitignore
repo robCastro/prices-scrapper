@@ -1,0 +1,4 @@
+__pycache__/
+venv/
+productos.json
+data.csv

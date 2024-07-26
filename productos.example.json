@@ -1,0 +1,8 @@
+
+[
+    {
+        "descripcion": "Lorem Ipsum...",
+        "url": "https://www.foo.bar/products/1234",
+        "selector": "div.mid>div.right>div.price.strong.price"
+    }
+]
