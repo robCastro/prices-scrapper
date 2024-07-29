@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 from producto import Producto
+from pathlib import Path
 
 def main():
     print('Starting')
@@ -14,7 +15,8 @@ def main():
 
 def load_products():
     productos = []
-    with open('productos.json', 'r') as file_content:
+    filename = Path(__file__).parent.joinpath('productos.json')
+    with open(filename, 'r') as file_content:
         json_dictionary = json.load(file_content)
         productos = [Producto(**data) for data in json_dictionary]
     return productos
