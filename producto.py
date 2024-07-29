@@ -16,5 +16,6 @@ class Producto:
         html = urlopen(url=self.url).read().decode('utf-8')
         soup = BeautifulSoup(html, 'html.parser')
         price = soup.select_one(self.selector).get_text()
+        print(self.descripcion + ', ' + price)
         return price
     
