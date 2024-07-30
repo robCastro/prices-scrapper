@@ -56,7 +56,22 @@ class PriceObservationRepository:
     def find_by_id(self, id: int) -> PriceObservation:
         self.__cursor.execute('SELECT * FROM PRICE_OBSERVATION WHERE id = ?', (id,))
         price_dict = self.__cursor.fetchone()
-        return Product(**price_dict)
+        return PriceObservation(**price_dict)
+    
+    def find_by_product_id(self, product_id: int) -> List[PriceObservation]:
+        self.__cursor.execute('SELECT * FROM PRICE_OBSERVATION WHERE product_id = ?', (product_id,)) 
+        prices_list = self.__cursor.fetchall()
+        return [PriceObservation(*data_tuple) for data_tuple in prices_list]
+    
+    def find_latest_by_product_id(self, product_id: int) -> PriceObservation:
+        self.__cursor.execute('SELECT * FROM PRICE_OBSERVATION WHERE product_id = ? ORDER BY id DESC LIMIT 1', (product_id,)) 
+        price_dict = self.__cursor.fetchone()
+        return PriceObservation(*price_dict)
+    
+    def find_average_price_by_product_id(self, product_id: int) -> float:
+        self.__cursor.execute('SELECT AVG(price) FROM PRICE_OBSERVATION WHERE product_id = ?', (product_id,)) 
+        avg_price = self.__cursor.fetchone()[0]
+        return avg_price
 
     def save(self, price_observation: PriceObservation) -> None:
         retorno = self.__cursor.execute('INSERT INTO PRICE_OBSERVATION (price, created_at, product_id) VALUES (?, ?, ?)', (price_observation.price, price_observation.created_at, price_observation.product_id))
