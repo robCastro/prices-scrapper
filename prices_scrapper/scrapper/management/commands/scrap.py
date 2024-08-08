@@ -23,14 +23,15 @@ class Command(BaseCommand):
                 self._scrap(product)
 
     def _scrap(self, product: Product):
+        previous_observation = PriceObservation.objects.filter(product=product)
         price = product.get_price()
-        latest_observation = PriceObservation.objects.filter(product=product).latest('created_at')
         observation = PriceObservation.objects.create(price=price, product=product)
-        if observation.price.compare(latest_observation.price):
-            result = f'New price for {product} of {observation.price} before it was {latest_observation.price}'
-            print(result)
-            self._send_email(product, result)
-        observation.save()
+        if previous_observation.exists():
+            latest_observation = previous_observation.latest('created_at')
+            if observation.price.compare(latest_observation.price):
+                result = f'New price for {product} of {observation.price} before it was {latest_observation.price}'
+                print(result)
+                self._send_email(product, result)
         self.stdout.write(
             self.style.SUCCESS(f'Successfully scrapped product {product.id}')
         )
