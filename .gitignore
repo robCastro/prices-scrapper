@@ -3,3 +3,4 @@ venv/
 productos.json
 data.csv
 products.db
+.env
