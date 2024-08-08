@@ -128,11 +128,11 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+SCRAPPER_CRON_SCHEDULE = str(os.getenv('SCRAPPER_CRON_SCHEDULE'))
+
 CRONJOBS = [
-    ('*/5 * * * *', 'django.core.management.call_command', ['scrap']),
+    (SCRAPPER_CRON_SCHEDULE, 'django.core.management.call_command', ['scrap']),
 ]
-
-
 
 EMAIL_BACKEND = str(os.getenv('EMAIL_BACKEND'))
 EMAIL_HOST = str(os.getenv('EMAIL_HOST'))
@@ -140,3 +140,4 @@ EMAIL_PORT = int(os.getenv('EMAIL_PORT'))
 EMAIL_HOST_USER = str(os.getenv('EMAIL_HOST_USER'))
 EMAIL_HOST_PASSWORD = str(os.getenv('EMAIL_HOST_PASSWORD'))
 EMAIL_USE_TLS = bool(os.getenv('EMAIL_USE_TLS'))
+EMAIL_RECIPIENT = str(os.getenv('EMAIL_RECIPIENT'))

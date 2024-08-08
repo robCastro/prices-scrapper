@@ -1,7 +1,7 @@
 from django.db import models
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
-
+from decimal import Decimal
 
 class Product(models.Model):
     description = models.CharField(max_length=500)
@@ -11,11 +11,11 @@ class Product(models.Model):
     def __str__(self) -> str:
         return self.description
     
-    def get_price(self) -> float:
+    def get_price(self) -> Decimal:
         html = urlopen(url=self.url).read().decode('utf-8')
         soup = BeautifulSoup(html, 'html.parser')
         price_string = soup.select_one(self.selector).get_text().replace(',', '.').replace('$', '')
-        return float(price_string)
+        return Decimal(price_string)
 
 
 class PriceObservation(models.Model):

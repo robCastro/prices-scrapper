@@ -1,7 +1,8 @@
 from typing import Any
 from django.core.management.base import BaseCommand, CommandError, CommandParser
 from scrapper.models import Product, PriceObservation
-
+from django.core.mail import send_mail
+from django.conf import settings
 
 class Command(BaseCommand):
     help = 'Scraps based on product id or all products'
@@ -23,7 +24,22 @@ class Command(BaseCommand):
 
     def _scrap(self, product: Product):
         price = product.get_price()
-        PriceObservation.objects.create(price=price, product=product)
+        latest_observation = PriceObservation.objects.filter(product=product).latest('created_at')
+        observation = PriceObservation.objects.create(price=price, product=product)
+        if observation.price.compare(latest_observation.price):
+            result = f'New price for {product} of {observation.price} before it was {latest_observation.price}'
+            print(result)
+            self._send_email(product, result)
+        observation.save()
         self.stdout.write(
             self.style.SUCCESS(f'Successfully scrapped product {product.id}')
+        )
+
+    def _send_email(self, product: Product, result: str):
+        send_mail(
+            subject=f'New price for {product}',
+            message=result,
+            from_email=settings.EMAIL_HOST_USER,
+            recipient_list=[settings.EMAIL_RECIPIENT],
+            fail_silently=False,
         )
