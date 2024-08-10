@@ -25,15 +25,16 @@ class Command(BaseCommand):
     def _scrap(self, product: Product):
         previous_observation = PriceObservation.objects.filter(product=product)
         price = product.get_price()
-        observation = PriceObservation.objects.create(price=price, product=product)
+        observation = PriceObservation(price=price, product=product)
         if previous_observation.exists():
             latest_observation = previous_observation.latest('created_at')
             if observation.price.compare(latest_observation.price):
                 result = f'New price for {product} of {observation.price} before it was {latest_observation.price}'
                 print(result)
                 self._send_email(product, result)
+        observation.save()
         self.stdout.write(
-            self.style.SUCCESS(f'Successfully scrapped product {product.id}')
+            self.style.SUCCESS(f'Successfully scrapped product {product}')
         )
 
     def _send_email(self, product: Product, result: str):
@@ -41,6 +42,6 @@ class Command(BaseCommand):
             subject=f'New price for {product}',
             message=result,
             from_email=settings.EMAIL_HOST_USER,
-            recipient_list=[settings.EMAIL_RECIPIENT],
+            recipient_list=[product.user.email],
             fail_silently=False,
         )
