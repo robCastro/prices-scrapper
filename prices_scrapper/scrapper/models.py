@@ -2,11 +2,14 @@ from django.db import models
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 from decimal import Decimal
+from django.contrib.auth.models import User
+
 
 class Product(models.Model):
     description = models.CharField(max_length=500)
     url = models.CharField(max_length=200)
     selector = models.CharField(max_length=200)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return self.description
