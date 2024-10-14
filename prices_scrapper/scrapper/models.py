@@ -1,24 +1,30 @@
 from django.db import models
-from bs4 import BeautifulSoup
-from urllib.request import urlopen
-from decimal import Decimal
 from django.contrib.auth.models import User
+
+
+class Vendor(models.Model):
+    TAG_OTHER = "OTHER"
+    TAG_META = "META"
+    TAG_TYPES = {
+        TAG_OTHER: "OTHER",
+        TAG_META: "META",
+    }
+    name = models.CharField(max_length=100)
+    selector = models.CharField(max_length=200)
+    tag_type = models.CharField(max_length=100, choices=TAG_TYPES, default=TAG_OTHER)
+
+    def __str__(self) -> str:
+        return self.name
 
 
 class Product(models.Model):
     description = models.CharField(max_length=500)
-    url = models.CharField(max_length=200)
-    selector = models.CharField(max_length=200)
+    url = models.CharField(max_length=300)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self) -> str:
         return self.description
-    
-    def get_price(self) -> Decimal:
-        html = urlopen(url=self.url).read().decode('utf-8')
-        soup = BeautifulSoup(html, 'html.parser')
-        price_string = soup.select_one(self.selector).get_text().replace(',', '.').replace('$', '')
-        return Decimal(price_string)
 
 
 class PriceObservation(models.Model):

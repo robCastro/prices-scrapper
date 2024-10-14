@@ -3,9 +3,11 @@ from django.core.management.base import BaseCommand, CommandError, CommandParser
 from scrapper.models import Product, PriceObservation
 from django.core.mail import send_mail
 from django.conf import settings
+from scrapper.scrappers import HtmlScrapper
 
 class Command(BaseCommand):
     help = 'Scraps based on product id or all products'
+    htmlScrapper = HtmlScrapper()
 
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument('--products', nargs='+', type=int)
@@ -24,7 +26,7 @@ class Command(BaseCommand):
 
     def _scrap(self, product: Product):
         previous_observation = PriceObservation.objects.filter(product=product)
-        price = product.get_price()
+        price = self.htmlScrapper.get_price(product=product)
         observation = PriceObservation(price=price, product=product)
         if previous_observation.exists():
             latest_observation = previous_observation.latest('created_at')
