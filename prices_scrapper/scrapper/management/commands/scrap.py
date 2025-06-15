@@ -25,8 +25,15 @@ class Command(BaseCommand):
                 self._scrap(product)
 
     def _scrap(self, product: Product):
+        try:
+            price = self.htmlScrapper.get_price(product=product)
+        except Exception as e:
+            self.stdout.write(
+                self.style.ERROR(f"Can't scrap product {product}")
+            )
+            print(e)
+            return
         previous_observation = PriceObservation.objects.filter(product=product)
-        price = self.htmlScrapper.get_price(product=product)
         observation = PriceObservation(price=price, product=product)
         if previous_observation.exists():
             latest_observation = previous_observation.latest('created_at')
