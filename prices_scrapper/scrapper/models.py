@@ -5,9 +5,11 @@ from django.contrib.auth.models import User
 class Vendor(models.Model):
     TAG_OTHER = "OTHER"
     TAG_META = "META"
+    TAG_JSON = "JSON"
     TAG_TYPES = {
         TAG_OTHER: "OTHER",
         TAG_META: "META",
+        TAG_JSON: "JSON",
     }
     name = models.CharField(max_length=100)
     selector = models.CharField(max_length=200)

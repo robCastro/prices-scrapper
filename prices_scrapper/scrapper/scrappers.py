@@ -4,11 +4,13 @@ from bs4 import BeautifulSoup, Tag
 from decimal import Decimal
 from urllib.request import urlopen
 from typing import List
+from jsonpath_ng import jsonpath, parse
+import requests
 
 
 class BaseScrapper(ABC):
     @abstractmethod
-    def get_price():
+    def get_price(self, product: Product) -> Decimal:
         """Scraps the price for a product"""
         pass
 
@@ -45,4 +47,13 @@ class HtmlScrapper(BaseScrapper):
         price_elements = self._get_price_elements(product)
         price = self._extract_lowest_price(product, price_elements)
         return price
+
+
+class JsonScrapper(BaseScrapper):
+    def get_price(self, product):
+        expression = parse(product.vendor.selector)
+        response = requests.get(product.url)
+        jsonResponse = response.json()
+        data = expression.find(jsonResponse)
+        return data[0].value
 
