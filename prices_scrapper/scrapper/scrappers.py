@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from .models import Product, Vendor
 from bs4 import BeautifulSoup, Tag
 from decimal import Decimal
-from urllib.request import urlopen
+from urllib.request import urlopen, build_opener, install_opener
 from typing import List
 from jsonpath_ng import jsonpath, parse
 import requests
@@ -16,6 +16,11 @@ class BaseScrapper(ABC):
 
 
 class HtmlScrapper(BaseScrapper):
+    def __init__(self):
+        opener = build_opener()
+        opener.addheaders = [('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36')]
+        install_opener(opener)
+
     def _get_price_elements(self, product: Product) -> List[Tag]:
         """
         Gets the price element from the HTML, for example,
